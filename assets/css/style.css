@@ -1,0 +1,48 @@
+body {
+  background-color: #f5f7fb;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+/* Custom Navbar */
+.custom-navbar {
+    background: linear-gradient(90deg, #003e92, #007bff);
+    padding: 12px 0;
+}
+
+.custom-navbar .navbar-brand {
+    font-size: 1.3rem;
+    color: #fff !important;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.custom-navbar .nav-link {
+    color: #e8e8e8 !important;
+    font-weight: 500;
+    padding: 8px 18px !important;
+    border-radius: 20px;
+    transition: 0.25s ease-in-out;
+}
+
+.custom-navbar .nav-link:hover {
+    background: rgba(255,255,255,0.18);
+    color: #fff !important;
+}
+
+.custom-navbar .nav-link.active {
+    background: #ffffff;
+    color: #003e92 !important;
+    font-weight: 700;
+}
+
+/* Toggler icon for dark navbar */
+.navbar-dark .navbar-toggler-icon {
+    filter: brightness(0) invert(1);
+}
