@@ -1,26 +1,29 @@
-# Use official PHP 8.2 image with Apache
 FROM php:8.2-apache
 
-# Enable required PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+# Install required PHP extensions
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    unzip \
+    libpng-dev \
+    curl \
+    && docker-php-ext-install zip mysqli pdo pdo_mysql
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
+# Copy project files
+COPY . /var/www/html/
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory to /var/www/html
-WORKDIR /var/www/html
-
-# Copy all project files
-COPY . .
-
-# Install PHP dependencies
+# Run composer install
 RUN composer install --no-interaction --prefer-dist --ignore-platform-reqs
 
-# Expose port 8080 for Render
+# Expose Render port
 EXPOSE 8080
 
-# Start Apache
+# Apache runs on port 8080 for Render
+RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
+
 CMD ["apache2-foreground"]
