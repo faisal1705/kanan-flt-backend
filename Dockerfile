@@ -23,7 +23,7 @@ RUN composer install --no-interaction --prefer-dist --ignore-platform-reqs
 # Expose Render port
 EXPOSE 8080
 
-# Apache runs on port 8080 for Render
+# Update Apache port for Render
 RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
 
 CMD ["apache2-foreground"]
