@@ -9,6 +9,10 @@
  * - Set your FLT Booking sheet ID below.
  */
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 function appendBookingToSheet(array $row)
