@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
-require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . 'https://kananflt.gt.tc/includes/functions.php';
 require_once __DIR__ . '/includes/sheet_api.php';
 require_once __DIR__ . '/includes/config.php';
 
