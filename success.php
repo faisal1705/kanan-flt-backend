@@ -1,4 +1,9 @@
 <?php
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+
 require_once __DIR__ . '/includes/header.php';
 $candidate = isset($_GET['candidate']) ? htmlspecialchars($_GET['candidate']) : null;
 ?>
