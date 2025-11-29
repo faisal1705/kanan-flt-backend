@@ -1,15 +1,20 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php'; // composer autoload
 
-require __DIR__ . '/../vendor/autoload.php';
+use MongoDB\Client;
 
-function getMongo()
-{
+function getMongoClient() {
     static $client = null;
-
     if ($client === null) {
-        $uri = getenv("MONGO_URI"); // from Render Environment Variable
-        $client = new MongoDB\Client($uri);
+        // prefer an env var on Render: MONGO_URI
+        $uri = getenv('MONGO_URI') ?: 'mongodb+srv://kanan_db_user:faisal0902@kananflt.ujcfrsr.mongodb.net/?appName=kananFLT';
+        $client = new Client($uri);
     }
+    return $client;
+}
 
-    return $client->selectDatabase("kanan_flt"); // db name
+function getMongoDB($dbName = null) {
+    $client = getMongoClient();
+    if ($dbName === null) $dbName = getenv('MONGO_DB') ?: 'kananflt';
+    return $client->selectDatabase($dbName);
 }
