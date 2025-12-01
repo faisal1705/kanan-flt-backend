@@ -1,42 +1,34 @@
 FROM php:8.2-apache
 
-# -----------------------------------------------------
-# Install system packages + PHP extensions
-# -----------------------------------------------------
+# 1. Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
-    libzip-dev unzip curl \
+    libzip-dev unzip curl ca-certificates \
     && docker-php-ext-install zip mysqli pdo pdo_mysql
 
-# Enable Apache mod_rewrite
+# 2. Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# -----------------------------------------------------
-# Install Composer
-# -----------------------------------------------------
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# 3. Create the certs folder and Download the TiDB/Let's Encrypt Root Certificate
+RUN mkdir -p /etc/ssl/certs && \
+    curl -o /etc/ssl/certs/tidb-ca.pem https://letsencrypt.org/certs/isrgrootx1.pem
 
-# -----------------------------------------------------
-# Copy App Files
-# -----------------------------------------------------
+# 4. Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# 5. Set working directory
 WORKDIR /var/www/html
-COPY . .
 
-# -----------------------------------------------------
-# Install PHP dependencies
-# (ignore platform reqs because Render uses a stripped-down PHP build)
-# -----------------------------------------------------
-RUN composer install --no-interaction --prefer-dist --ignore-platform-reqs || true
+# 6. Copy Project Files
+COPY . /var/www/html/
 
-# -----------------------------------------------------
-# Required for Render (Apache must run on port 8080)
-# -----------------------------------------------------
+# 7. Install PHP Dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# 8. Fix Permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# 9. Configure Ports for Render
+RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
 EXPOSE 8080
 
-# Change Apache from port 80 → 8080
-RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf \
-    && sed -i 's/:80/:8080/g' /etc/apache2/sites-enabled/000-default.conf
-
-# -----------------------------------------------------
-# Start Apache
-# -----------------------------------------------------
 CMD ["apache2-foreground"]
