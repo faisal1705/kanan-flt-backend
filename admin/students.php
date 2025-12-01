@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
-requireAdminLogin();
+
 require_once __DIR__ . '/../includes/header.php';
 
 $pdo = getPDO();
