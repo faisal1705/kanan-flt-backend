@@ -62,7 +62,7 @@ th {
                     <th>Batch</th>
                     <th>Faculty</th>
                     <th>RM</th>
-                    <th width="70">Status</th>
+                    <th>Status</th>
                     <th>Updated</th>
                     <th width="120">Actions</th>
                 </tr>
@@ -78,7 +78,7 @@ th {
                     <td><?= htmlspecialchars($r['faculty_name']) ?></td>
                     <td><?= htmlspecialchars($r['rm']) ?></td>
 
-                    <td>
+                    <td width="70">
                         <span class="badge-status 
                             <?= ($r['status']=='Active'?'status-active':
                                  ($r['status']=='On Hold'?'status-hold':
