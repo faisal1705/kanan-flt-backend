@@ -21,8 +21,9 @@ WORKDIR /var/www/html
 # 6. Copy Project Files
 COPY . /var/www/html/
 
-# 7. Install PHP Dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# 7. Install PHP Dependencies (THIS IS THE FIX)
+# We add COMPOSER_MEMORY_LIMIT=-1 to stop the crash
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
 # 8. Fix Permissions
 RUN chown -R www-data:www-data /var/www/html
