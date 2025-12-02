@@ -5,7 +5,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-W
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
 
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/includes/header.php';
 $candidate = isset($_GET['candidate']) ? htmlspecialchars($_GET['candidate']) : null;
 ?>
 <div class="container my-5">
