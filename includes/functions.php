@@ -64,3 +64,32 @@ function requireAdminLogin() {
         exit;
     }
 }
+
+function searchStudents($pdo, $q = '')
+{
+    if (!$q) {
+        return $pdo->query("SELECT * FROM students ORDER BY updated_at DESC LIMIT 200")
+                   ->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $q = strtolower(trim($q));
+    $like = "%$q%";
+
+    $sql = "
+        SELECT *
+        FROM students
+        WHERE LOWER(name) LIKE ?
+           OR LOWER(phone) LIKE ?
+           OR LOWER(email) LIKE ?
+           OR LOWER(student_code) LIKE ?
+           OR LOWER(batch) LIKE ?
+           OR LOWER(crm_code) LIKE ?
+        ORDER BY updated_at DESC
+        LIMIT 200
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$like, $like, $like, $like, $like, $like]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
