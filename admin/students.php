@@ -3,51 +3,30 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/header.php';
 
 $pdo = getPDO();
-$search = trim($_GET['q'] ?? '');
 
-if ($search !== '') {
-
-    // 🔥 Search by name, phone, AND student_code
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM students
-        WHERE 
-            name LIKE ? 
-            OR phone LIKE ? 
-            OR student_code LIKE ?
-        ORDER BY updated_at DESC 
-        LIMIT 200
-    ");
-    $like = '%' . $search . '%';
-    $stmt->execute([$like, $like, $like]);
-
-} else {
-    $stmt = $pdo->query("SELECT * FROM students ORDER BY updated_at DESC LIMIT 200");
+// If AJAX search request
+if (isset($_GET['ajax']) && isset($_GET['q'])) {
+    echo json_encode(searchStudents($pdo, $_GET['q']));
+    exit;
 }
 
-$rows = $stmt->fetchAll();
+// Normal page load
+$rows = searchStudents($pdo, $_GET['q'] ?? '');
 ?>
-<div class="container my-4">
 
+<div class="container my-4">
   <h3>Students (from Consolidated Sheet)</h3>
   <a href="dashboard.php" class="btn btn-link mb-3">Back to Dashboard</a>
 
-  <form class="row g-2 mb-3" method="GET">
-    <div class="col-auto">
-      <input type="text" name="q" value="<?php echo htmlspecialchars($search); ?>"
-             class="form-control" placeholder="Search by name, phone, or student code">
-    </div>
-    <div class="col-auto">
-      <button class="btn btn-primary">Search</button>
-    </div>
-  </form>
+  <!-- 🔍 Dynamic Search Box -->
+  <input type="text" id="searchBox" class="form-control mb-3" placeholder="Search by name, phone, email, student code, batch..." autocomplete="off">
 
   <div class="table-responsive">
     <table class="table table-striped table-bordered table-sm align-middle">
       <thead class="table-dark">
         <tr>
           <th>ID</th>
-          <th>Student Code</th> <!-- ✅ NEW -->
+          <th>Student Code</th>
           <th>Name</th>
           <th>Phone</th>
           <th>Email</th>
@@ -58,24 +37,54 @@ $rows = $stmt->fetchAll();
           <th>Updated</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="studentTable">
         <?php foreach ($rows as $r): ?>
           <tr>
-            <td><?php echo (int)$r['id']; ?></td>
-            <td><?php echo htmlspecialchars($r['student_code']); ?></td> <!-- ✅ NEW -->
-            <td><?php echo htmlspecialchars($r['name']); ?></td>
-            <td><?php echo htmlspecialchars($r['phone']); ?></td>
-            <td><?php echo htmlspecialchars($r['email']); ?></td>
-            <td><?php echo htmlspecialchars($r['batch']); ?></td>
-            <td><?php echo htmlspecialchars($r['faculty_name']); ?></td>
-            <td><?php echo htmlspecialchars($r['rm']); ?></td>
-            <td><?php echo htmlspecialchars($r['status']); ?></td>
-            <td><?php echo htmlspecialchars($r['updated_at']); ?></td>
+            <td><?= (int)$r['id'] ?></td>
+            <td><?= htmlspecialchars($r['student_code']) ?></td>
+            <td><?= htmlspecialchars($r['name']) ?></td>
+            <td><?= htmlspecialchars($r['phone']) ?></td>
+            <td><?= htmlspecialchars($r['email']) ?></td>
+            <td><?= htmlspecialchars($r['batch']) ?></td>
+            <td><?= htmlspecialchars($r['faculty_name']) ?></td>
+            <td><?= htmlspecialchars($r['rm']) ?></td>
+            <td><?= htmlspecialchars($r['status']) ?></td>
+            <td><?= htmlspecialchars($r['updated_at']) ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
   </div>
 </div>
+
+<!-- 🔥 AJAX Live Search Script -->
+<script>
+document.getElementById("searchBox").addEventListener("keyup", function () {
+    let q = this.value;
+
+    fetch("students.php?ajax=1&q=" + encodeURIComponent(q))
+        .then(res => res.json())
+        .then(rows => {
+            let tbody = document.getElementById("studentTable");
+            tbody.innerHTML = "";
+
+            rows.forEach(r => {
+                tbody.innerHTML += `
+                <tr>
+                    <td>${r.id}</td>
+                    <td>${r.student_code}</td>
+                    <td>${r.name}</td>
+                    <td>${r.phone}</td>
+                    <td>${r.email}</td>
+                    <td>${r.batch}</td>
+                    <td>${r.faculty_name}</td>
+                    <td>${r.rm}</td>
+                    <td>${r.status}</td>
+                    <td>${r.updated_at}</td>
+                </tr>`;
+            });
+        });
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
