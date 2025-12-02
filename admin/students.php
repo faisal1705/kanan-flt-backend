@@ -43,7 +43,6 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
             rows.forEach(r => {
                 html += `
                 <tr>
-                    <td>${r.id}</td>
                     <td>${r.student_code}</td>
                     <td>${r.name}</td>
                     <td>${r.phone}</td>
@@ -115,7 +114,6 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
         <table class="table table-hover table-bordered align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
                     <th>Student Code</th>
                     <th>Name</th>
                     <th>Phone</th>
