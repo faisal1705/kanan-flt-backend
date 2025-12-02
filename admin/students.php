@@ -62,7 +62,7 @@ th {
                     <th>Batch</th>
                     <th>Faculty</th>
                     <th>RM</th>
-                    <th>Status</th>
+                    <th width="70">Status</th>
                     <th>Updated</th>
                     <th width="120">Actions</th>
                 </tr>
