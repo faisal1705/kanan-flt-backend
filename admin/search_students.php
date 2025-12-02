@@ -1,25 +1,59 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
-requireAdminLogin();
-
 $pdo = getPDO();
-$q = strtolower(trim($_GET['q'] ?? ''));
 
-$query = "
-    SELECT *
-    FROM students
-    WHERE 
-        LOWER(name) LIKE ? OR 
-        LOWER(phone) LIKE ? OR
-        LOWER(email) LIKE ? OR
-        LOWER(student_code) LIKE ? OR
-        LOWER(batch) LIKE ?
-    ORDER BY updated_at DESC
-    LIMIT 200
-";
+$q = trim($_GET['q'] ?? '');
 
-$like = "%$q%";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$like, $like, $like, $like, $like]);
+if ($q == '') {
+    $stmt = $pdo->query("SELECT * FROM students ORDER BY updated_at DESC LIMIT 200");
+    $rows = $stmt->fetchAll();
+} else {
+    $sql = "SELECT * FROM students 
+            WHERE 
+                name LIKE ? OR 
+                phone LIKE ? OR
+                email LIKE ? OR
+                batch LIKE ? OR
+                faculty_name LIKE ? OR
+                student_code LIKE ?
+            ORDER BY updated_at DESC LIMIT 200";
 
-echo json_encode($stmt->fetchAll());
+    $like = '%' . $q . '%';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$like,$like,$like,$like,$like,$like]);
+
+    $rows = $stmt->fetchAll();
+}
+
+foreach ($rows as $r):
+?>
+
+<tr>
+    <td><?= htmlspecialchars($r['student_code']) ?></td>
+    <td><?= htmlspecialchars($r['name']) ?></td>
+    <td><?= htmlspecialchars($r['phone']) ?></td>
+    <td><?= htmlspecialchars($r['email']) ?></td>
+    <td><?= htmlspecialchars($r['batch']) ?></td>
+    <td><?= htmlspecialchars($r['faculty_name']) ?></td>
+    <td><?= htmlspecialchars($r['rm']) ?></td>
+
+    <td>
+        <span class="badge-status 
+            <?= ($r['status']=='Active'?'status-active':
+                 ($r['status']=='On Hold'?'status-hold':
+                 ($r['status']=='Process Started'?'status-proc':'status-other'))) ?>">
+            <?= htmlspecialchars($r['status']) ?>
+        </span>
+    </td>
+
+    <td><?= htmlspecialchars($r['updated_at']) ?></td>
+
+    <td>
+        <a href="view_student.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-primary">View</a>
+        <a href="edit_student.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-info">Edit</a>
+        <a href="delete_student.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-danger"
+           onclick="return confirm('Delete student?');">Delete</a>
+    </td>
+</tr>
+
+<?php endforeach; ?>
