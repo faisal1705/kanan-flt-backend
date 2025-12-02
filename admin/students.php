@@ -29,34 +29,38 @@ $rows = $stmt->fetchAll();
 
   <div class="table-responsive">
     <table class="table table-striped table-bordered table-sm align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>Batch</th>
-          <th>Faculty</th>
-          <th>RM</th>
-          <th>Status</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($rows as $r): ?>
-          <tr>
-            <td><?php echo (int)$r['id']; ?></td>
-            <td><?php echo htmlspecialchars($r['name']); ?></td>
-            <td><?php echo htmlspecialchars($r['phone']); ?></td>
-            <td><?php echo htmlspecialchars($r['email']); ?></td>
-            <td><?php echo htmlspecialchars($r['batch']); ?></td>
-            <td><?php echo htmlspecialchars($r['faculty_name']); ?></td>
-            <td><?php echo htmlspecialchars($r['rm']); ?></td>
-            <td><?php echo htmlspecialchars($r['status']); ?></td>
-            <td><?php echo htmlspecialchars($r['updated_at']); ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
+<thead class="table-dark">
+    <tr>
+        <th>ID</th>
+        <th>Student Code</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Batch</th>
+        <th>Faculty</th>
+        <th>RM</th>
+        <th>Status</th>
+        <th>Updated</th>
+    </tr>
+</thead>
+
+<tbody>
+<?php foreach ($rows as $r): ?>
+    <tr>
+        <td><?php echo (int)$r['id']; ?></td>
+        <td><?php echo htmlspecialchars($r['student_code']); ?></td>
+        <td><?php echo htmlspecialchars($r['name']); ?></td>
+        <td><?php echo htmlspecialchars($r['phone']); ?></td>
+        <td><?php echo htmlspecialchars($r['email']); ?></td>
+        <td><?php echo htmlspecialchars($r['batch']); ?></td>
+        <td><?php echo htmlspecialchars($r['faculty_name']); ?></td>
+        <td><?php echo htmlspecialchars($r['rm']); ?></td>
+        <td><?php echo htmlspecialchars($r['status']); ?></td>
+        <td><?php echo htmlspecialchars($r['updated_at']); ?></td>
+    </tr>
+<?php endforeach; ?>
+</tbody>
+
     </table>
   </div>
 </div>
