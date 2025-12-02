@@ -32,6 +32,26 @@ th {
     border-radius: 6px;
     font-size: 13px;
 }
+/* Fix status badge: prevent wrapping & autosize */
+.status-badge {
+    white-space: nowrap;       /* Keep text in one line */
+    padding: 4px 10px;
+    display: inline-block;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Optional: custom colors */
+.status-prep {
+    background: #6c757d;
+    color: white;
+}
+
+.status-booked {
+    background: #0d6efd;
+    color: white;
+}
 
 .status-active { background:#198754; color:white; }
 .status-hold   { background:#ffc107; color:black; }
@@ -78,14 +98,22 @@ th {
                     <td><?= htmlspecialchars($r['faculty_name']) ?></td>
                     <td><?= htmlspecialchars($r['rm']) ?></td>
 
-                    <td width="70">
-                        <span class="badge-status 
-                            <?= ($r['status']=='Active'?'status-active':
-                                 ($r['status']=='On Hold'?'status-hold':
-                                 ($r['status']=='Process Started'?'status-proc':'status-other'))) ?>">
-                            <?= htmlspecialchars($r['status']) ?>
-                        </span>
+                    <td>
+                    <?php
+                        $status = trim($r['status']);
+                
+                        if ($status === "Prep On") {
+                            echo '<span class="status-badge status-prep">Prep On</span>';
+                        }
+                        elseif ($status === "Date Booked") {
+                            echo '<span class="status-badge status-booked">Date Booked</span>';
+                        }
+                        else {
+                            echo '<span class="status-badge">'.$status.'</span>';
+                        }
+                    ?>
                     </td>
+
 
                     <td><?= htmlspecialchars($r['updated_at']) ?></td>
 
