@@ -37,19 +37,29 @@ th {
     width: 180px;
 }
 
+/* Fix status column from shrinking */
+td:nth-child(8) {
+    min-width: 110px;         /* prevents compression */
+}
+
+/* Status badge stays perfect */
 .status-badge {
     white-space: nowrap;
-    padding: 4px 10px;
+    padding: 6px 12px;
     display: inline-block;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
+    text-align: center;
 }
+
+/* Individual colors */
 .status-prep { background:#6c757d; color:white; }
 .status-booked { background:#0d6efd; color:white; }
 .status-active { background:#198754; color:white; }
 .status-hold { background:#ffc107; color:black; }
 .status-proc { background:#0d6efd; color:white; }
+
 
 .view-btn { background:#0d6efd; }
 .edit-btn { background:#0dcaf0; }
@@ -107,7 +117,7 @@ th {
     </div>
 
     <div class="table-card">
-        <table class="table table-hover table-bordered align-middle">
+        <table class="table table-hover table-bordered align-middle" style="table-layout: fixed;">
             <thead>
                 <tr>
                     <th>Student Code</th>
