@@ -6,6 +6,12 @@ require_once __DIR__ . '/../includes/header.php';
 $pdo = getPDO();
 $stmt = $pdo->query("SELECT * FROM students ORDER BY updated_at DESC LIMIT 200");
 $rows = $stmt->fetchAll();
+
+// Dropdown filter values
+$filterBatch = $pdo->query("SELECT DISTINCT batch FROM students ORDER BY batch")->fetchAll();
+$filterFaculty = $pdo->query("SELECT DISTINCT faculty_name FROM students ORDER BY faculty_name")->fetchAll();
+$filterRM = $pdo->query("SELECT DISTINCT rm FROM students ORDER BY rm")->fetchAll();
+$filterStatus = $pdo->query("SELECT DISTINCT status FROM students ORDER BY status")->fetchAll();
 ?>
 
 <style>
@@ -27,36 +33,23 @@ th {
     padding: 8px 15px;
 }
 
-.badge-status {
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 13px;
+.filter-select {
+    width: 180px;
 }
-/* Fix status badge: prevent wrapping & autosize */
+
 .status-badge {
-    white-space: nowrap;       /* Keep text in one line */
+    white-space: nowrap;
     padding: 4px 10px;
     display: inline-block;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
 }
-
-/* Optional: custom colors */
-.status-prep {
-    background: #6c757d;
-    color: white;
-}
-
-.status-booked {
-    background: #0d6efd;
-    color: white;
-}
-
+.status-prep { background:#6c757d; color:white; }
+.status-booked { background:#0d6efd; color:white; }
 .status-active { background:#198754; color:white; }
-.status-hold   { background:#ffc107; color:black; }
-.status-proc   { background:#0d6efd; color:white; }
-.status-other  { background:#6c757d; color:white; }
+.status-hold { background:#ffc107; color:black; }
+.status-proc { background:#0d6efd; color:white; }
 
 .view-btn { background:#0d6efd; }
 .edit-btn { background:#0dcaf0; }
@@ -64,15 +57,57 @@ th {
 </style>
 
 <div class="container my-4">
-    <h3 class="fw-bold mb-3">👨‍🎓 Students (Synced from Consolidated Sheet)</h3>
+    <h3 class="fw-bold mb-3">📚 Students (Synced from Consolidated Sheet)</h3>
     <a href="dashboard.php" class="btn btn-secondary mb-3">← Back to Dashboard</a>
 
-    <!-- 🔍 AJAX Search -->
-    <input type="text" id="search" class="form-control search-box mb-3"
-           placeholder="Search by name, phone, email, batch, faculty…">
+    <!-- 🔍 SEARCH + FILTERS -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-4">
+            <input type="text" id="search" class="form-control search-box"
+                   placeholder="Search by name, phone, email, faculty, batch…">
+        </div>
+
+        <div class="col-md-2">
+            <select id="filterBatch" class="form-select filter-select">
+                <option value="">All Batch</option>
+                <?php foreach ($filterBatch as $b): ?>
+                    <option><?= htmlspecialchars($b['batch']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select id="filterFaculty" class="form-select filter-select">
+                <option value="">All Faculty</option>
+                <?php foreach ($filterFaculty as $f): ?>
+                    <option><?= htmlspecialchars($f['faculty_name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select id="filterRM" class="form-select filter-select">
+                <option value="">All RM</option>
+                <?php foreach ($filterRM as $r): ?>
+                    <option><?= htmlspecialchars($r['rm']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select id="filterStatus" class="form-select filter-select">
+                <option value="">All Status</option>
+                <?php foreach ($filterStatus as $s): ?>
+                    <option><?= htmlspecialchars($s['status']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+    </div>
 
     <div class="table-card">
-        <table class="table table-hover table-bordered align-middle" id="studentsTable">
+        <table class="table table-hover table-bordered align-middle">
             <thead>
                 <tr>
                     <th>Student Code</th>
@@ -88,64 +123,38 @@ th {
                 </tr>
             </thead>
             <tbody id="studentBody">
-                <?php foreach ($rows as $r): ?>
-                <tr>
-                    <td><?= htmlspecialchars($r['student_code']) ?></td>
-                    <td><?= htmlspecialchars($r['name']) ?></td>
-                    <td><?= htmlspecialchars($r['phone']) ?></td>
-                    <td><?= htmlspecialchars($r['email']) ?></td>
-                    <td><?= htmlspecialchars($r['batch']) ?></td>
-                    <td><?= htmlspecialchars($r['faculty_name']) ?></td>
-                    <td><?= htmlspecialchars($r['rm']) ?></td>
-
-                    <td>
-                    <?php
-                        $status = trim($r['status']);
-                
-                        if ($status === "Prep On") {
-                            echo '<span class="status-badge status-prep">Prep On</span>';
-                        }
-                        elseif ($status === "Date Booked") {
-                            echo '<span class="status-badge status-booked">Date Booked</span>';
-                        }
-                        else {
-                            echo '<span class="status-badge">'.$status.'</span>';
-                        }
-                    ?>
-                    </td>
-
-
-                    <td><?= htmlspecialchars($r['updated_at']) ?></td>
-
-                    <td>
-                        <a href="view_student.php?id=<?= $r['id'] ?>" 
-                           class="btn btn-sm btn-primary view-btn mb-1">View</a>
-
-                        <a href="edit_student.php?id=<?= $r['id'] ?>" 
-                           class="btn btn-sm btn-info edit-btn mb-1">Edit</a>
-
-                        <a href="delete_student.php?id=<?= $r['id'] ?>" 
-                           onclick="return confirm('Delete this student?');"
-                           class="btn btn-sm btn-danger delete-btn">Delete</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                <?php include 'search_students.php'; ?>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- AJAX SEARCH SCRIPT -->
+<!-- 🔥 AJAX Live Search + Filters -->
 <script>
-document.getElementById("search").addEventListener("keyup", function () {
-    let query = this.value;
+function loadStudents() {
+    let q = document.getElementById("search").value;
+    let b = document.getElementById("filterBatch").value;
+    let f = document.getElementById("filterFaculty").value;
+    let r = document.getElementById("filterRM").value;
+    let s = document.getElementById("filterStatus").value;
 
-    fetch("search_students.php?q=" + encodeURIComponent(query))
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById("studentBody").innerHTML = html;
-        });
-});
+    fetch("search_students.php?q=" + encodeURIComponent(q)
+        + "&batch=" + encodeURIComponent(b)
+        + "&faculty=" + encodeURIComponent(f)
+        + "&rm=" + encodeURIComponent(r)
+        + "&status=" + encodeURIComponent(s)
+    )
+    .then(res => res.text())
+    .then(html => {
+        document.getElementById("studentBody").innerHTML = html;
+    });
+}
+
+document.getElementById("search").addEventListener("keyup", loadStudents);
+document.getElementById("filterBatch").addEventListener("change", loadStudents);
+document.getElementById("filterFaculty").addEventListener("change", loadStudents);
+document.getElementById("filterRM").addEventListener("change", loadStudents);
+document.getElementById("filterStatus").addEventListener("change", loadStudents);
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
