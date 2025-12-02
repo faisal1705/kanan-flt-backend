@@ -5,9 +5,9 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-W
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
 
-require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/sheet_api.php';
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/sheet_api.php';
+require_once __DIR__ . '/includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
