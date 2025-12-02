@@ -7,10 +7,8 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/sheet_api.php';
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/mailer.php'; // <--- ADDED THIS
 require_once __DIR__ . '/vendor/autoload.php';
-
-echo __DIR__;
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
@@ -28,7 +26,6 @@ if ($phone === '' || $fltDay === '' || $fltType === '') {
 
 $today = new DateTime('now');
 $phpDay = (int)$today->format('N'); // 1=Mon..7=Sun
-$phone = trim($_POST['phone']);
 
 if (!preg_match('/^\d{10}$/', $phone)) {
     die("Invalid phone number. Must be 10 digits.");
@@ -39,7 +36,8 @@ if (!in_array($phpDay, REG_OPEN_DAYS, true)) {
     if ($email !== '') {
         $subject = 'FLT Booking Not Open';
         $msg = "Hello,\n\nRegistration opens every Tuesday and closes on Thursday.\nPlease try again during that period.";
-        @mail($email, $subject, $msg);
+        // UPDATED TO PHPMAILER
+        sendEmail($email, $subject, nl2br($msg)); 
     }
     die('Registration is currently closed.');
 }
@@ -50,7 +48,8 @@ if (!$student) {
     if ($email !== '') {
         $subject = 'FLT Booking Not Successful';
         $msg = "Hello,\n\nYour number is not registered in our system. Please contact the administrator.";
-        @mail($email, $subject, $msg);
+        // UPDATED TO PHPMAILER
+        sendEmail($email, $subject, nl2br($msg));
     }
     die('Number not registered.');
 }
@@ -71,7 +70,8 @@ if (
     if ($email !== '') {
         $subject = 'FLT Booking Closed - Holiday';
         $msg = "Hello {$student['name']},\n\nFLT is not conducted on {$fltDay}. Please check the updated schedule or contact the administrator.";
-        @mail($email, $subject, $msg);
+        // UPDATED TO PHPMAILER
+        sendEmail($email, $subject, nl2br($msg));
     }
     die('FLT not conducted on selected day.');
 }
@@ -81,7 +81,8 @@ if (hasExistingBooking($phone)) {
     if ($email !== '') {
         $subject = 'Duplicate FLT Submission';
         $msg = "Hello {$student['name']},\n\nIt seems you have already booked your FLT. Duplicate submission removed.";
-        @mail($email, $subject, $msg);
+        // UPDATED TO PHPMAILER
+        sendEmail($email, $subject, nl2br($msg));
     }
     die('You have already booked FLT.');
 }
@@ -94,7 +95,8 @@ if (
     if ($email !== '') {
         $subject = 'FLT Booking Failed - Invalid Type';
         $msg = "Hello {$student['name']},\n\nCBT option is only available on Sunday. Please select \"Pen Paper\" for Saturday slots.";
-        @mail($email, $subject, $msg);
+        // UPDATED TO PHPMAILER
+        sendEmail($email, $subject, nl2br($msg));
     }
     die('CBT only allowed on Sunday.');
 }
@@ -109,8 +111,8 @@ if ($fltDay === 'Saturday- Slot 1') {
     $minNo = 101; $maxNo = 150;
 } else {
     if ($email !== '') {
-        @mail($email, 'FLT Booking Failed - Invalid Slot',
-            "Hello {$student['name']},\n\nThe selected slot \"{$fltDay}\" is invalid.");
+        // UPDATED TO PHPMAILER
+        sendEmail($email, 'FLT Booking Failed - Invalid Slot', "Hello {$student['name']}<br><br>The selected slot \"{$fltDay}\" is invalid.");
     }
     die('Invalid slot selected.');
 }
@@ -135,10 +137,11 @@ if (empty($usedNos)) {
         }
     }
 }
+
 if ($newFltNo === null) {
     if ($email !== '') {
-        @mail($email, 'FLT Booking Failed - Slot Full',
-            "Hello {$student['name']},\n\nThe selected slot ({$fltDay}) is full. Please try another.");
+        // UPDATED TO PHPMAILER
+        sendEmail($email, 'FLT Booking Failed - Slot Full', "Hello {$student['name']}<br><br>The selected slot ({$fltDay}) is full. Please try another.");
     }
     die('Selected slot is full.');
 }
@@ -220,12 +223,11 @@ $htmlBody = "
 ";
 
 if ($email !== '') {
+    // UPDATED TO PHPMAILER - No need for manual headers anymore
     $subject = 'Your FLT Booking Confirmation';
-    $headers  = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-    $headers .= "From: Kanan FLT System <{$adminEmail}>\r\n";
-    @mail($email, $subject, $htmlBody, $headers);
+    sendEmail($email, $subject, $htmlBody);
 }
 
 header('Location: success.php?candidate=' . urlencode($newFltNo));
 exit;
+?>
