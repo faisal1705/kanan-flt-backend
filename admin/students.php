@@ -41,6 +41,17 @@ th {
 td:nth-child(8) {
     min-width: 110px;         /* prevents compression */
 }
+/* Fix long email / name overflow */
+td {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal !important;
+}
+
+td:nth-child(4),   /* Email */
+td:nth-child(2) {  /* Name */
+    max-width: 180px;
+}
 
 /* Status badge stays perfect */
 .status-badge {
