@@ -38,12 +38,26 @@ foreach ($rows as $r):
     <td><?= htmlspecialchars($r['rm']) ?></td>
 
     <td>
-        <span class="badge-status 
-            <?= ($r['status']=='Active'?'status-active':
-                 ($r['status']=='On Hold'?'status-hold':
-                 ($r['status']=='Process Started'?'status-proc':'status-other'))) ?>">
-            <?= htmlspecialchars($r['status']) ?>
-        </span>
+       <?php
+$status = trim($r['status']);
+
+if ($status === "Prep On") {
+    echo '<span class="status-badge status-prep">Prep On</span>';
+}
+elseif ($status === "Date Booked") {
+    echo '<span class="status-badge status-booked">Date Booked</span>';
+}
+elseif ($status === "Plan Drop") {
+    echo '<span class="status-badge status-hold">Plan Drop</span>';
+}
+elseif ($status === "Extended") {
+    echo '<span class="status-badge status-proc">Extended</span>';
+}
+else {
+    echo '<span class="status-badge">'.$status.'</span>';
+}
+?>
+
     </td>
 
     <td><?= htmlspecialchars($r['updated_at']) ?></td>
