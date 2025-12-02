@@ -25,7 +25,7 @@ foreach ($data as $row) {
 
     // Extract values
     $name       = $row['Name'] ?? '';
-    $email      = $row['Email'] ?? '';
+    $email      = $row['Email Address'] ?? '';
     $alt_phone  = $row['Alt. No.'] ?? '';
     $month      = $row['Enrollment Month'] ?? '';
     $date_raw   = $row['Enrollment Date'] ?? '';
