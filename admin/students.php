@@ -131,7 +131,6 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
             <tbody id="studentsBody">
                 <?php foreach ($rows as $r): ?>
                 <tr>
-                    <td><?= $r['id'] ?></td>
                     <td><?= htmlspecialchars($r['student_code']) ?></td>
                     <td><?= htmlspecialchars($r['name']) ?></td>
                     <td><?= htmlspecialchars($r['phone']) ?></td>
