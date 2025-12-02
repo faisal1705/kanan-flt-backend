@@ -60,7 +60,7 @@ if (!defined('BASE_URL')) {
 <nav class="navbar navbar-expand-lg custom-navbar shadow-sm ">
   <div class="container-fluid px-4">
 
-    <a class="navbar-brand fw-bold" href="<?php echo BASE_URL; ?>/index.php">
+    <a class="navbar-brand fw-bold" href="<?php echo BASE_URL; ?>/public/index.php">
       <i class="bi bi-check2-square me-2"></i>
       Kanan FLT System
     </a>
