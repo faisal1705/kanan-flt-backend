@@ -148,7 +148,7 @@ document.querySelector("form").addEventListener("submit", function(e) {
             Please enter your registered phone number.
           </div>
 
-          <form action="https://kananflt-backend.onrender.com/book.php" method="POST">
+          <form action="https://kananflt-backend.onrender.com/public/book.php" method="POST">
 
 
             <div class="mb-3">
