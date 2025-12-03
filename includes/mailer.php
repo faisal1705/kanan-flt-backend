@@ -7,47 +7,47 @@ require_once __DIR__ . '/../vendor/autoload.php';
 function sendEmail($to, $subject, $htmlBody) {
     $mail = new PHPMailer(true);
     
-    // 1. Grab credentials from Render Environment Variables
     $smtpUser = getenv('MAIL_USER'); 
     $smtpPass = getenv('MAIL_PASS');
 
-    // 2. Security Check: Stop if keys are missing
     if (!$smtpUser || !$smtpPass) {
-        error_log("EMAIL ERROR: MAIL_USER or MAIL_PASS variables are missing in Render.");
+        error_log("EMAIL ERROR: Credentials missing.");
         return false;
     }
 
-   // ... inside sendEmail function ...
-try {
-    $mail->isSMTP();
-    $mail->Host       = 'smtp.gmail.com';
-    $mail->SMTPAuth   = true;
-    $mail->Username   = $smtpUser;
-    $mail->Password   = $smtpPass;
-    
-    // SWITCH TO SSL ON PORT 465 (More reliable on Render)
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; 
-    $mail->Port       = 465; 
+    try {
+        // 1. Force IPv4 (Fixes 'Network is unreachable' on Render)
+        $mail->Host = gethostbyname('smtp.gmail.com'); 
+        
+        // 2. Server Settings
+        $mail->isSMTP();
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $smtpUser;
+        $mail->Password   = $smtpPass;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Use TLS
+        $mail->Port       = 587;                            // Use Port 587
 
-    // ... rest of the code ...
+        // 3. Relax SSL Options (Prevents connection drops)
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true
+            )
+        );
 
-        // 4. Sender & Recipient
+        // 4. Content
         $mail->setFrom($smtpUser, 'Kanan FLT System');
         $mail->addAddress($to);
-
-        // 5. Content
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body    = $htmlBody;
 
         $mail->send();
-        
-        // Log success to Render console
         error_log("Email sent successfully to: " . $to);
         return true;
 
     } catch (Exception $e) {
-        // Log the exact error from Gmail
         error_log("EMAIL FAILED: " . $mail->ErrorInfo);
         return false;
     }
