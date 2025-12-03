@@ -26,10 +26,13 @@ function appendBookingToSheet(array $row)
         return;
     }
 
-    // 2. CRITICAL FIX: Handle Newlines in Private Key
-    // Render/Docker sometimes escapes '\n' as literal characters. This fixes it.
+    // 2. CRITICAL FIX: Repair the Private Key
+    // Render often escapes newlines like "\\n" instead of "\n". This fixes it.
     if (isset($config['private_key'])) {
+        // Replace literal \n with actual newlines
         $config['private_key'] = str_replace('\\n', "\n", $config['private_key']);
+        // Ensure standard formatting
+        $config['private_key'] = str_replace("PRIVATE KEY-----\n", "PRIVATE KEY-----\n", $config['private_key']);
     }
 
     try {
@@ -40,7 +43,7 @@ function appendBookingToSheet(array $row)
         $service = new Google_Service_Sheets($client);
 
         // 3. Spreadsheet Configuration
-        // Note: This is the NEW ID from your code. Make sure the Sheet is shared with the bot!
+        // MAKE SURE THIS ID MATCHES YOUR NEW SHEET
         $spreadsheetId = '1ySw_eks9muyPgH3cblOnmtNSn9IuHI8XyykO334UeoQ'; 
         $range = 'FLT Booking!A:Z';
 
