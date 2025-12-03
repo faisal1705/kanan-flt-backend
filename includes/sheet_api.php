@@ -28,6 +28,9 @@ function appendBookingToSheet(array $row)
 
     $client = new Google_Client();
     $client->setAuthConfig($config);
+    error_log("Loaded service account email: " . $config['client_email']);
+error_log("Private key first line: " . substr($config['private_key'], 0, 25));
+
     $client->setScopes(['https://www.googleapis.com/auth/spreadsheets']);
 
     $service = new Google_Service_Sheets($client);
