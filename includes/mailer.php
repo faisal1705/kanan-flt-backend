@@ -1,43 +1,55 @@
 <?php
-// includes/mailer.php
-// Uses Resend API to send emails
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-function sendEmail($to, $subject, $html)
-{
-    $apiKey = getenv("RESEND_API_KEY"); // Store in Render Environment Variables
+require_once __DIR__ . '/../vendor/autoload.php';
 
-    if (!$apiKey) {
-        error_log("RESEND_API_KEY is missing.");
+function sendEmail($to, $subject, $htmlBody) {
+    $mail = new PHPMailer(true);
+    
+    $smtpUser = getenv('MAIL_USER'); 
+    $smtpPass = getenv('MAIL_PASS');
+
+    if (!$smtpUser || !$smtpPass) {
+        error_log("EMAIL ERROR: Credentials missing.");
         return false;
     }
 
-    $payload = [
-        "from" => "Kanan FLT System <noreply@kananflt.com>",
-        "to" => [$to],
-        "subject" => $subject,
-        "html" => $html
-    ];
+    try {
+        // --- THE MAGIC FIX ---
+        // Force PHP to resolve the IPv4 address of Gmail
+        // This fixes "Network is unreachable" on Render
+        $mail->Host = gethostbyname('smtp.gmail.com');
+        
+        $mail->isSMTP();
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $smtpUser;
+        $mail->Password   = $smtpPass;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Must use TLS
+        $mail->Port       = 587;                            // Must use Port 587
 
-    $ch = curl_init("https://api.resend.com/emails");
+        // Relax SSL rules (Prevents certificate errors)
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Authorization: Bearer {$apiKey}",
-        "Content-Type: application/json"
-    ]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        $mail->setFrom($smtpUser, 'Kanan FLT System');
+        $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $htmlBody;
 
-    $response = curl_exec($ch);
+        $mail->send();
+        error_log("EMAIL SUCCESS: Sent to " . $to);
+        return true;
 
-    if (curl_errno($ch)) {
-        error_log("RESEND CURL ERROR: " . curl_error($ch));
-        curl_close($ch);
+    } catch (Exception $e) {
+        error_log("EMAIL FAILED: " . $mail->ErrorInfo);
         return false;
     }
-
-    curl_close($ch);
-    error_log("RESEND RESPONSE: " . $response);
-
-    return true;
 }
+?>
