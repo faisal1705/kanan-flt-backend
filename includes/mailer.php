@@ -16,27 +16,28 @@ function sendEmail($to, $subject, $htmlBody) {
     }
 
     try {
-        // 1. Force IPv4 (Fixes 'Network is unreachable' on Render)
-        $mail->Host = gethostbyname('smtp.gmail.com'); 
-        
-        // 2. Server Settings
+        // --- CRITICAL FIX START ---
+        // Force IPv4 Address resolution
+        // This fixes "Network unreachable" on Render/Docker
+        $mail->Host = gethostbyname('smtp.gmail.com');
+        // --- CRITICAL FIX END ---
+
         $mail->isSMTP();
         $mail->SMTPAuth   = true;
         $mail->Username   = $smtpUser;
         $mail->Password   = $smtpPass;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Use TLS
-        $mail->Port       = 587;                            // Use Port 587
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+        $mail->Port       = 587;
 
-        // 3. Relax SSL Options (Prevents connection drops)
+        // Relax SSL verification
         $mail->SMTPOptions = array(
             'ssl' => array(
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
+                'verify_peer' => false,
+                'verify_peer_name' => false,
                 'allow_self_signed' => true
             )
         );
 
-        // 4. Content
         $mail->setFrom($smtpUser, 'Kanan FLT System');
         $mail->addAddress($to);
         $mail->isHTML(true);
@@ -44,7 +45,7 @@ function sendEmail($to, $subject, $htmlBody) {
         $mail->Body    = $htmlBody;
 
         $mail->send();
-        error_log("Email sent successfully to: " . $to);
+        error_log("EMAIL SUCCESS: Sent to " . $to);
         return true;
 
     } catch (Exception $e) {
