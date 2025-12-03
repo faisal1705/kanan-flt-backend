@@ -28,6 +28,8 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --o
 # 8. Fix Permissions
 RUN chown -R www-data:www-data /var/www/html
 
+RUN ln -snf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime && echo "Asia/Kolkata" > /etc/timezone
+
 # 9. Configure Ports for Render
 RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
 EXPOSE 8080
