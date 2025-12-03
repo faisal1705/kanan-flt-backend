@@ -17,15 +17,19 @@ function sendEmail($to, $subject, $htmlBody) {
         return false;
     }
 
-    try {
-        // 3. Server settings
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $smtpUser;
-        $mail->Password   = $smtpPass;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Standard TLS
-        $mail->Port       = 587;
+   // ... inside sendEmail function ...
+try {
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $smtpUser;
+    $mail->Password   = $smtpPass;
+    
+    // SWITCH TO SSL ON PORT 465 (More reliable on Render)
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; 
+    $mail->Port       = 465; 
+
+    // ... rest of the code ...
 
         // 4. Sender & Recipient
         $mail->setFrom($smtpUser, 'Kanan FLT System');
