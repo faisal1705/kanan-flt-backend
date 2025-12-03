@@ -1,5 +1,30 @@
 <?php
 require_once __DIR__ . '/db.php';
+function sendResendEmail($to, $subject, $html) {
+
+    $apiKey = getenv("RESEND_API_KEY");
+    if (!$apiKey) {
+        error_log("RESEND_API_KEY missing");
+        return false;
+    }
+
+    try {
+        $resend = new \Resend\Resend($apiKey);
+
+        $resend->emails->send([
+            'from' => 'Kanan FLT <no-reply@kanan.co>',
+            'to' => $to,
+            'subject' => $subject,
+            'html' => $html
+        ]);
+
+        return true;
+
+    } catch (Exception $e) {
+        error_log("RESEND ERROR: " . $e->getMessage());
+        return false;
+    }
+}
 
 function getSetting($key, $default = null) {
     $pdo = getPDO();
